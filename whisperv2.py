@@ -12,9 +12,9 @@ BLOCK_MS = 30
 BLOCK_SIZE = int(SAMPLE_RATE * BLOCK_MS / 1000)
 
 WINDOW_SECONDS = 5
-TRANSCRIBE_EVERY = 2
+TRANSCRIBE_EVERY = 1
 
-MODEL_NAME = "small.en"
+MODEL_NAME = "tiny.en"
 
 print("Loading Whisper model...")
 
@@ -29,6 +29,8 @@ print("Model loaded.")
 
 rolling_buffer = deque()
 buffer_lock = threading.Lock()
+
+MAX_SAMPLES = SAMPLE_RATE * WINDOW_SECONDS
 
 def audio_callback(indata, frames, time_info, status):
 
@@ -103,7 +105,7 @@ def transcriber_worker():
             if not rolling_buffer:
                 continue
 
-            audio = np.concentate(
+            audio = np.concatenate(
                 list(rolling_buffer),
                 axis=0
             )
@@ -137,11 +139,11 @@ def transcriber_worker():
             print(previous_transcript)
 
             print("\nCurrent:")
-            print(current_transcribe)
+            print(current_transcript)
 
             new_text = get_new_text(
-                previous_transcribe,
-                current_transcribe
+                previous_transcript,
+                current_transcript
             )
 
             print("\nNew")
@@ -154,7 +156,7 @@ def transcriber_worker():
             print("================================")
 
             if new_text:
-                handle_commad(new_text)
+                handle_command(new_text)
 
             previous_transcript = current_transcript
 
@@ -173,7 +175,7 @@ print("Listening...")
 
 with sd.InputStream(
     samplerate=SAMPLE_RATE,
-    channel=1,
+    channels=1,
     dtype="int16",
     blocksize=BLOCK_SIZE,
     callback=audio_callback

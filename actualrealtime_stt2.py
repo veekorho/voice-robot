@@ -13,7 +13,7 @@ SAMPLE_RATE = 16000
 BLOCK_MS = 30
 BLOCK_SIZE = int(SAMPLE_RATE * BLOCK_MS / 1000)
 
-BUFFER_SECONDS = 2.2
+BUFFER_SECONDS = 1.5
 
 #Adjust recording start volume
 RMS_THRESHOLD = 500
@@ -25,7 +25,7 @@ audio_queue = queue.Queue()
 #Load transcription model
 print("Loading Whisper model...")
 model = WhisperModel(
-    "small.en", #model (i.e small, small.en, medium...)
+    "tiny.en", #model (i.e small, small.en, medium...)
     device="cpu",
     compute_type="int8"
 )
