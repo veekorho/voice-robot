@@ -6,18 +6,19 @@ import numpy as np
 import sounddevice as sd
 from scipy.io.wavfile import write
 from faster_whisper import WhisperModel
+import threading
+from time import sleep
 
 SAMPLE_RATE = 16000
 BLOCK_MS = 30
 BLOCK_SIZE = int(SAMPLE_RATE * BLOCK_MS / 1000)
 
-BUFFER_SECONDS = 3
+BUFFER_SECONDS = 2.2
 
 #Adjust recording start volume
 RMS_THRESHOLD = 500
 #Adjust how much total silence is needed before recording ends
 SILENCE_BLOCKS = 35
-
 
 audio_queue = queue.Queue()
 
@@ -38,7 +39,8 @@ def callback(indata, frames, time, status):
  audio_queue.put(indata.copy())
 
 ############################################
-
+#COMMANDS
+############################################
 def handle_command(text):
  text = text.lower()
 
