@@ -128,25 +128,13 @@ with InputStream:
      axis=0
     )
 
-    temp_path = None
-
+    audio = audio.flatten().astype(np.float32)
+    audio /= 32768.0
+    
     try:
 
-     with tempfile.NamedTemporaryFile(
-      suffix=".wav",
-      delete=False
-     ) as f:
-
-      temp_path = f.name
-
-     write(
-      temp_path,
-      SAMPLE_RATE,
-      audio
-     )
-
      segments, info = model.transcribe(
-      temp_path,
+      audio,
       language="en",
       beam_size=5,
       vad_filter=True,
@@ -173,11 +161,6 @@ with InputStream:
     except Exception as e:
 
      print("Error:", e)
-
-    finally:
-
-     if temp_path and os.path.exists(temp_path):
-      os.remove(temp_path)
 
     speech_buffer = []
     silence_count = 0
