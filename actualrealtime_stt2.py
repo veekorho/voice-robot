@@ -6,8 +6,6 @@ import numpy as np
 import sounddevice as sd
 from scipy.io.wavfile import write
 from faster_whisper import WhisperModel
-import threading
-from time import sleep
 
 SAMPLE_RATE = 16000
 BLOCK_MS = 30
