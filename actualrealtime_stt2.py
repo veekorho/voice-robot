@@ -6,22 +6,26 @@ import numpy as np
 import sounddevice as sd
 from scipy.io.wavfile import write
 from faster_whisper import WhisperModel
+import threading
+from time import sleep
 
 SAMPLE_RATE = 16000
 BLOCK_MS = 30
 BLOCK_SIZE = int(SAMPLE_RATE * BLOCK_MS / 1000)
 
-BUFFER_SECONDS = 3
+BUFFER_SECONDS = 2.2
 
+#Adjust recording start volume
 RMS_THRESHOLD = 500
-SILENCE_BLOCKS = 20
-
+#Adjust how much total silence is needed before recording ends
+SILENCE_BLOCKS = 35
 
 audio_queue = queue.Queue()
 
+#Load transcription model
 print("Loading Whisper model...")
 model = WhisperModel(
-    "small.en",
+    "small.en", #model (i.e small, small.en, medium...)
     device="cpu",
     compute_type="int8"
 )
@@ -35,10 +39,12 @@ def callback(indata, frames, time, status):
  audio_queue.put(indata.copy())
 
 ############################################
-
+#COMMANDS
+############################################
 def handle_command(text):
  text = text.lower()
 
+#Will choose the command that appears first in the list. For non-conflicting commands use regular if-statements(?)
  if "forward" in text:
   print("MOVE FORWARD")
  elif "left" in text:
@@ -49,7 +55,7 @@ def handle_command(text):
   print("MOVE BACKWARD")
  elif "stop" in text:
   print("STOP")
- elif str(6) in text and str(7) in text:
+ elif (str(6) in text and str(7) in text) or ("six" in text and "seven" in text):
    print(''' ██████╗   ███████╗
 ██╔════╝   ╚════██║
 ██████╗       ██╔╝
@@ -116,8 +122,6 @@ with InputStream:
 
     recording = False
 
-    InputStream.stop()
-
     print("Transcribing...")
     
     audio = np.concatenate(
@@ -179,4 +183,3 @@ with InputStream:
 
     speech_buffer = []
     silence_count = 0
-    InputStream.start()
