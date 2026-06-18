@@ -153,7 +153,7 @@ with InputStream:
 
       print("Heard:", text)
 
-      handle_command(text)
+      command_queue.put(text)
     
      else:
       
