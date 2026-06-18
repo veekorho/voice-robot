@@ -167,3 +167,5 @@ def transcribe():
 
      speech_buffer = []
      silence_count = 0
+
+transcribe()
