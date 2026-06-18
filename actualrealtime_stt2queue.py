@@ -7,9 +7,8 @@ import sounddevice as sd
 from scipy.io.wavfile import write
 from faster_whisper import WhisperModel
 
+command_queue = queue.Queue()
 audio_queue = queue.Queue()
-
-
 
 ############################################
 
@@ -58,6 +57,7 @@ def transcribe():
  )
  
  #Config values
+
  SAMPLE_RATE = 16000
  BLOCK_MS = 30
  BLOCK_SIZE = int(SAMPLE_RATE * BLOCK_MS / 1000)
@@ -69,8 +69,6 @@ def transcribe():
  RMS_THRESHOLD = 500
  #Adjust how much total silence is needed before recording ends
  SILENCE_BLOCKS = 35
-
- command_queue = queue.Queue()
  print("Always listening...")
 
  ROLLING_BLOCKS = int(
