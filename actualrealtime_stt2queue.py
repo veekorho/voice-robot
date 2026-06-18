@@ -65,103 +65,103 @@ def handle_command(text):
   print("UNKNOWN COMMAND")
 
 ###########################################
+def transcribe():
+ command_queue = queue.Queue()
+ print("Always listening...")
 
-command_queue = queue.Queue()
-print("Always listening...")
+ ROLLING_BLOCKS = int(
+  BUFFER_SECONDS * SAMPLE_RATE / BLOCK_SIZE
+ )
 
-ROLLING_BLOCKS = int(
- BUFFER_SECONDS * SAMPLE_RATE / BLOCK_SIZE
-)
+ rolling_buffer = deque(maxlen=ROLLING_BLOCKS)
+ InputStream = sd.InputStream(
+  samplerate=SAMPLE_RATE,
+  channels=1,
+  dtype="int16",
+  blocksize=BLOCK_SIZE,
+  callback=callback
+ )
+ with InputStream:
 
-rolling_buffer = deque(maxlen=ROLLING_BLOCKS)
-InputStream = sd.InputStream(
- samplerate=SAMPLE_RATE,
- channels=1,
- dtype="int16",
- blocksize=BLOCK_SIZE,
- callback=callback
-)
-with InputStream:
+  recording = False
+  silence_count = 0
+  speech_buffer = []
 
- recording = False
- silence_count = 0
- speech_buffer = []
+  while True:
+   block = audio_queue.get()
 
- while True:
-  block = audio_queue.get()
+   rolling_buffer.append(block)
 
-  rolling_buffer.append(block)
+   audio_float = block.astype(np.float32)
 
-  audio_float = block.astype(np.float32)
+   rms = np.sqrt(
+    np.mean(audio_float ** 2)
+   )
 
-  rms = np.sqrt(
-   np.mean(audio_float ** 2)
-  )
+   if rms > RMS_THRESHOLD:
 
-  if rms > RMS_THRESHOLD:
+    if not recording:
+     print("\nSpeech detected")
 
-   if not recording:
-    print("\nSpeech detected")
+     recording = True
 
-    recording = True
+     speech_buffer = list(rolling_buffer)
 
-    speech_buffer = list(rolling_buffer)
+    speech_buffer.append(block)
 
-   speech_buffer.append(block)
+    silence_count = 0
 
-   silence_count = 0
+   elif recording:
 
-  elif recording:
+    speech_buffer.append(block)
 
-   speech_buffer.append(block)
+    silence_count += 1
 
-   silence_count += 1
+    if silence_count >= SILENCE_BLOCKS:
 
-   if silence_count >= SILENCE_BLOCKS:
+     recording = False
 
-    recording = False
-
-    print("Transcribing...")
+     print("Transcribing...")
     
-    audio = np.concatenate(
+     audio = np.concatenate(
 
-     speech_buffer,
-     axis=0
-    )
-
-    audio = audio.flatten().astype(np.float32)
-    audio /= 32768.0
-    
-    try:
-
-     segments, info = model.transcribe(
-      audio,
-      language="en",
-      beam_size=5,
-      vad_filter=True,
-      vad_parameters=dict(
-       min_silence_duration_ms=300
-      )
+      speech_buffer,
+      axis=0
      )
 
-     text = " ".join(
-      segment.text
-      for segment in segments
-     ).strip()
-
-     if text:
-
-      print("Heard:", text)
-
-      command_queue.put(text)
+     audio = audio.flatten().astype(np.float32)
+     audio /= 32768.0
     
-     else:
+     try:
+
+      segments, info = model.transcribe(
+       audio,
+       language="en",
+       beam_size=5,
+       vad_filter=True,
+       vad_parameters=dict(
+        min_silence_duration_ms=300
+       )
+      )
+
+      text = " ".join(
+       segment.text
+       for segment in segments
+      ).strip()
+
+      if text:
+
+       print("Heard:", text)
+
+       command_queue.put(text)
+    
+      else:
       
-      print("No speech recognized.")
+       print("No speech recognized.")
 
-    except Exception as e:
+     except Exception as e:
 
-     print("Error:", e)
+      print("Error:", e)
 
-    speech_buffer = []
-    silence_count = 0
+     speech_buffer = []
+     silence_count = 0
