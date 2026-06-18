@@ -66,7 +66,6 @@ def handle_command(text):
 
 ###########################################
 
-command_queue = queue.Queue()
 print("Always listening...")
 
 ROLLING_BLOCKS = int(
