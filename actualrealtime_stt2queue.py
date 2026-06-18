@@ -7,26 +7,9 @@ import sounddevice as sd
 from scipy.io.wavfile import write
 from faster_whisper import WhisperModel
 
-SAMPLE_RATE = 16000
-BLOCK_MS = 30
-BLOCK_SIZE = int(SAMPLE_RATE * BLOCK_MS / 1000)
-
-BUFFER_SECONDS = 1.5
-
-#Adjust recording start volume
-RMS_THRESHOLD = 500
-#Adjust how much total silence is needed before recording ends
-SILENCE_BLOCKS = 35
-
 audio_queue = queue.Queue()
 
-#Load transcription model
-print("Loading Whisper model...")
-model = WhisperModel(
-    "tiny.en", #model (i.e small, small.en, medium...)
-    device="cpu",
-    compute_type="int8"
-)
+
 
 ############################################
 
@@ -66,6 +49,27 @@ def handle_command(text):
 
 ###########################################
 def transcribe():
+ #Load transcription model
+ print("Loading Whisper model...")
+ model = WhisperModel(
+     "tiny.en", #model (i.e small, small.en, medium...)
+     device="cpu",
+     compute_type="int8"
+ )
+ 
+ #Config values
+ SAMPLE_RATE = 16000
+ BLOCK_MS = 30
+ BLOCK_SIZE = int(SAMPLE_RATE * BLOCK_MS / 1000)
+
+#Amount of recording in buffer
+ BUFFER_SECONDS = 1.5
+
+ #Adjust recording start volume
+ RMS_THRESHOLD = 500
+ #Adjust how much total silence is needed before recording ends
+ SILENCE_BLOCKS = 35
+
  command_queue = queue.Queue()
  print("Always listening...")
 
