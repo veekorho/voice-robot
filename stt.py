@@ -37,7 +37,7 @@ def audio_callback(indata, frames, time_info, status):
     #print(indata.shape)  #<- should be (xxx, 1)
     samples = indata[:,0]    
     with buffer_lock:
-      audio_buffer.extend(smaples)
+      audio_buffer.extend(samples)
       
 def listen():
   with sd.InputStream(samplerate=SAMPLE_RATE, 
@@ -52,13 +52,15 @@ def listen():
 def transcribe(q):
   while True:
     time.sleep(WAIT_SECONDS)
+    print("start")
     with buffer_lock:
-      if len(audio_buffer) < WINDOW_SAMPLES: ## if not enough audio data skip this iteration
-        continue
-      audio_chunk = np.array(list(audio_buffer)[-WINDOW_SMAPLES:], dtype=np.float32)
+        print("lock")
+        #if len(audio_buffer) <= WINDOW_SAMPLES: ## if not enough audio data skip this iteration
+            #continue
+        audio_chunk = np.array(list(audio_buffer)[-WINDOW_SAMPLES:], dtype=np.float32)
 
-    #give audio data to AI to transcriebe 
-    #print("Transcribing...")
+    #give audio data to AI to transcribe 
+    print("Transcribing...")
     segments, info = model.transcribe(audio_chunk,
                                       language="en",
                                       beam_size=1
@@ -76,22 +78,8 @@ def transcribe(q):
 if __name__ == "__main__":
   print(sd.query_devices())
   lt = threading.Thread(target=listen, daemon=True)
-  tt = thrading.Thread(target=transcribe, daemon=True)
+  tt = threading.Thread(target=transcribe, args=(Queue(),), daemon=True)
   lt.start()
   tt.start()
 
 
-############################
-# SETTING UP MICROPHONE
-
-# sudo apt update
-# sudo apt install portaudio19-dev
-#??? sudo apt install libasound2-dev python3-dev
-
-#pip3 install sounddevice  (if alr installed: pip3 uninstall sounddevice and then)
-
-#check these:
-# arecord -1   -> see if jetson detects mic
-# arecord -D hw:1,0 -f S16_LE -r 16000 test.wav  -> records into test file (end with ctrlC)
-#     aplay test.wav
-        

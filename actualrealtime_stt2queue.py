@@ -50,7 +50,7 @@ def handle_command(text):
   print("UNKNOWN COMMAND")
 
 ###########################################
-def transcribe():
+def transcribe(q):
  #Load transcription model
  print("Loading Whisper model...")
  model = WhisperModel(
@@ -69,7 +69,7 @@ def transcribe():
  BUFFER_SECONDS = 1.5
 
  #Adjust recording start volume
- RMS_THRESHOLD = 500
+ RMS_THRESHOLD = 1500
  #Adjust how much total silence is needed before recording ends
  SILENCE_BLOCKS = 35
  print("Always listening...")
@@ -156,10 +156,12 @@ def transcribe():
       ).strip()
 
       if text:
-
-       print("Heard:", text)
-
-       command_queue.put(text)
+       clean_text = text.lower()
+       clean_text = clean_text.replace(".", "")
+       clean_text = clean_text.replace("!", "")
+       clean_text = clean_text.replace(",", "")
+       
+       q.put(clean_text)
     
       else:
       
@@ -172,4 +174,4 @@ def transcribe():
      speech_buffer = []
      silence_count = 0
 
-transcribe()
+
