@@ -1,0 +1,71 @@
+
+IF YOU'VE CLONED REPOSITORY ONTO A NEW DEVICE:
+1. create a venv ("python -m venv venv")
+2. activate venv ("source venv/bin/activate")
+3. try "python sockServer.py"
+      -> it will give an error about a missing library
+      -> pip install that library
+4. repeat step 3 until running sockServer prints: "Server running.s"
+5. ctrl+C
+
+
+CONNECTING TO RASPBERRY:
+1. connect the raspberry and your device to the same network 
+2. make sure raspberry's code has your device's ip address:
+     -> find your device's ip with "hostname -I"
+     -> go to raspberry's python file Robotti/Code/Server/sockClient.py
+     -> change the ip address on line 5 to your ip address
+3. run sockServer.py on your device
+     -> activate venv ("source venv/bin/activate")
+     -> "python sockServer.py"
+     -> when the code prints "Server running..." proceed to the next step
+4. run runMartti.py from raspberry ("sudo python Code/Server/runMartti.py")
+     -> in a while it should say a connection has been made on your device:
+       Connection from ('172.20.10.11', 39964) has been established.
+       starting stt...
+       Loading Whisper model...
+       Always listening...
+       with inputstream
+5. speak into the mic
+      -> ai will soon transcribe your speech and print what it has transcribed. This command is sent to raspberry. 
+        Speech detected
+        Transcribing...
+        your command
+6. when finished, give command "turn off" and the raspberry pi code will end.
+7. to end the code on your device just ctrl+c many times 
+8. exit the venv with "deactivate"
+
+
+IF MICROPHONE DOES NOT SEEM TO WORK: (it does not say speech detected)
+1. connect microphone while device is turned off
+2. check from settings that input device is set to wireless mic DIGITAL input
+IF RUNNING STILL DOES NOT WORK
+1. activate venv ("source venv/bin/activate")
+2. "python actualrealtime_stt2queue.py"
+3. try speaking into mic. if it transcribes, yippee!!
+4. ctrl+C
+5. run sockServer.py again.
+IF IT SSTTIILL does NOT work...
+   -> you're on your own ;D
+
+
+
+
+DEFAULT COMMANDS YOU CAN USE:
+"stop" -> stops anything the robot is currently doing
+"play" -> plays 440Hz
+"play no surprises" -> plays "no surprises" by Radiohead
+"go forwards"
+"go backwards"
+"turn left"
+"turn right"
+"I love you"
+"flash" -> cool light effect
+"avoid" -> avoid obstacles mode 
+"happy" -> makes robot happy
+"sad" -> makes robot sad
+"execute order 66" -> muahahahaa
+
+"off" -> disconnects raspberry from your device.
+
+
