@@ -10,6 +10,7 @@ audio_queue = queue.Queue()
 
 ############################################
 
+
 def callback(indata, frames, time, status):
  if status:
   print(status)
@@ -17,6 +18,8 @@ def callback(indata, frames, time, status):
  audio_queue.put(indata.copy())
 
 ###########################################
+
+
 def transcribe(q):
  #Load transcription model
  print("Loading Whisper model...")
@@ -46,14 +49,14 @@ def transcribe(q):
  )
 
  rolling_buffer = deque(maxlen=ROLLING_BLOCKS)
- InputStream = sd.InputStream(
+ 
+ with sd.InputStream(
   samplerate=SAMPLE_RATE,
   channels=1,
   dtype="int16",
   blocksize=BLOCK_SIZE,
   callback=callback
- )
- with InputStream:
+ ):
   print("with inputstream")
 
   recording = False
