@@ -1,4 +1,4 @@
-#!/home/martti/voice-robot/venv/bin/python3
+#!/home/kesa_fyysikko/voice-robot/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
