@@ -1,6 +1,5 @@
 
 IF YOU'VE CLONED REPOSITORY ONTO A NEW DEVICE:
-0. remove venv folder
 1. create a venv ("python -m venv venv")
 2. activate venv ("source venv/bin/activate")
 3. try "python sockServer.py"
