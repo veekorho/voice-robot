@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/home/martti/voice-robot/venv/lib/python3.12/site-packages')
 import queue
 import tempfile
 import os
