@@ -6,7 +6,7 @@ IF YOU'VE CLONED REPOSITORY ONTO A NEW DEVICE:
 3. try "python sockServer.py"
       -> it will give an error about a missing library
       -> pip install that library
-4. repeat step 3 until running sockServer prints: "Server running..."
+4. repeat step 3 until running sockServer prints: "Server running.s"
 5. ctrl+C
 
 
