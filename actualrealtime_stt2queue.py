@@ -10,7 +10,7 @@ audio_queue = queue.Queue()
 
 ############################################
 
-
+#Audio input handling
 def callback(indata, frames, time, status):
  if status:
   print(status)
@@ -19,13 +19,13 @@ def callback(indata, frames, time, status):
 
 ###########################################
 
-
+#Transcription process
 def transcribe(q):
- #Load transcription model
+ 
  print("Loading Whisper model...")
- model = WhisperModel(
+ model = WhisperModel( #Load transcription model
      "tiny.en", #model (i.e small, small.en, medium...)
-     device="cpu",
+     device="cpu", #cuda, cpu or auto
      compute_type="int8"
  )
  
@@ -35,15 +35,14 @@ def transcribe(q):
  BLOCK_MS = 30
  BLOCK_SIZE = int(SAMPLE_RATE * BLOCK_MS / 1000)
 
-#Amount of recording in buffer
- BUFFER_SECONDS = 1.5
+ BUFFER_SECONDS = 1.5 #Amount of recording in buffer
 
- #Adjust recording start volume
- RMS_THRESHOLD = 1500
- #Adjust how much total silence is needed before recording ends
- SILENCE_BLOCKS = 35
+ RMS_THRESHOLD = 1500 #Adjust recording start volume
+ 
+ SILENCE_BLOCKS = 35 #Adjust how much total silence is needed before recording ends
+ 
  print("Always listening...")
-
+ 
  ROLLING_BLOCKS = int(
   BUFFER_SECONDS * SAMPLE_RATE / BLOCK_SIZE
  )
@@ -74,7 +73,7 @@ def transcribe(q):
     np.mean(audio_float ** 2)
    )
 
-   if rms > RMS_THRESHOLD:
+   if rms > RMS_THRESHOLD: #Wait until loud enough audio, then begin recording
 
     if not recording:
      print("\nSpeech detected")
@@ -93,30 +92,29 @@ def transcribe(q):
 
     silence_count += 1
 
-    if silence_count >= SILENCE_BLOCKS:
+    if silence_count >= SILENCE_BLOCKS: #Wait for long enough silence, then begin transcription and stop recording
 
      recording = False
 
      print("Transcribing...")
     
      audio = np.concatenate(
-
       speech_buffer,
       axis=0
      )
 
      audio = audio.flatten().astype(np.float32)
-     audio /= 32768.0
+     audio /= 32768.0 #Magic number that makes the program work
     
      try:
 
       segments, info = model.transcribe(
        audio,
        language="en",
-       beam_size=5,
-       condition_on_previous_text=False,
-       hotwords="execute, off, stop",
-       vad_filter=True,
+       beam_size=5, #Number of beams used for beam search
+       condition_on_previous_text=False, #Whether or not the model will use context from previous transcriptions for making new ones
+       hotwords="execute, off, stop", #The model will be more likely to recognize words listed here
+       vad_filter=True, #Filters out silences of certain length from input data; define the length with min_silence_duration_ms
        vad_parameters=dict(
         min_silence_duration_ms=300
        )
