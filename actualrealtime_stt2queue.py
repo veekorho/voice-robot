@@ -16,34 +16,6 @@ def callback(indata, frames, time, status):
 
  audio_queue.put(indata.copy())
 
-############################################
-#COMMANDS
-############################################
-def handle_command(text):
- text = text.lower()
-
-#Will choose the command that appears first in the list. For non-conflicting commands use regular if-statements(?)
- if "forward" in text:
-  print("MOVE FORWARD")
- elif "left" in text:
-  print("TURN LEFT")
- elif "right" in text:
-  print("TURN RIGHT")
- elif "back" in text:
-  print("MOVE BACKWARD")
- elif "stop" in text:
-  print("STOP")
- elif (str(6) in text and str(7) in text) or ("six" in text and "seven" in text):
-   print(''' ██████╗   ███████╗
-██╔════╝   ╚════██║
-██████╗       ██╔╝
-██╔══██╗     ██╔╝
-██║  ██║    ██╔╝
-╚█████╔╝    ██║
- ╚════╝     ╚═╝''')
- else:
-  print("UNKNOWN COMMAND")
-
 ###########################################
 def transcribe(q):
  #Load transcription model
