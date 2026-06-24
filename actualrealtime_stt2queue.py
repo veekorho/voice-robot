@@ -114,6 +114,8 @@ def transcribe(q):
        audio,
        language="en",
        beam_size=5,
+       condition_on_previous_text=False,
+       hotwords="execute, off, stop",
        vad_filter=True,
        vad_parameters=dict(
         min_silence_duration_ms=300
