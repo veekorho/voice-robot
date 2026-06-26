@@ -143,5 +143,3 @@ def transcribe(q):
 
      speech_buffer = []
      silence_count = 0
-
-
